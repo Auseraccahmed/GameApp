@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>START - Party Games</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap');
+:root{--bg:#080812;--panel:#151526;--pink:#ff36bd;--blue:#24d9ff;--green:#39ff9c;--text:#fff}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at top,#19133b,#080812 60%);color:var(--text);font-family:'Cairo',sans-serif;min-height:100vh}
+button,input,select{font:inherit}
+button{cursor:pointer;border:0;color:white}
+.app{max-width:760px;margin:auto;padding:20px 16px 50px}
+header{text-align:center;padding:22px 0 12px}
+.logo{font-size:clamp(48px,13vw,88px);font-weight:900;letter-spacing:5px;background:linear-gradient(90deg,#ff36bd,#24d9ff,#39ff9c,#ff36bd);background-size:300%;color:transparent;background-clip:text;-webkit-background-clip:text;animation:rgb 4s linear infinite;filter:drop-shadow(0 0 13px #ff36bd88)}
+@keyframes rgb{to{background-position:300%}}
+.subtitle{color:#b8b6d7;letter-spacing:3px;font-size:13px}
+h1,h2,h3{text-align:center}
+h2{font-size:25px}
+.card{background:#151526dd;border:1px solid #ffffff19;border-radius:22px;padding:20px;margin:16px 0;box-shadow:0 0 25px #0007}
+.menu{display:grid;gap:15px;margin-top:24px}
+.gameBtn{padding:22px;border-radius:18px;font-size:23px;font-weight:900;background:#17172b;border:1px solid #ffffff20;transition:.2s}
+.gameBtn:nth-child(1){box-shadow:inset 0 0 20px #ff36bd22,0 0 15px #ff36bd33}
+.gameBtn:nth-child(2){box-shadow:inset 0 0 20px #24d9ff22,0 0 15px #24d9ff33}
+.gameBtn:nth-child(3){box-shadow:inset 0 0 20px #39ff9c22,0 0 15px #39ff9c33}
+.gameBtn:active,.primary:active{transform:scale(.97)}
+.primary,.secondary,.danger{padding:12px 18px;border-radius:13px;font-weight:800;margin:5px}
+.primary{background:linear-gradient(100deg,#a82dff,#ed36b9);box-shadow:0 0 15px #d32aff55}
+.secondary{background:#292944;border:1px solid #ffffff22}
+.danger{background:#8c2448}
+input,select{width:100%;padding:13px;border-radius:12px;background:#090918;color:white;border:1px solid #494568;margin:7px 0;outline:none}
+input:focus,select:focus{border-color:var(--blue)}
+label{display:block;color:#c9c5e4;margin-top:10px}
+.row{display:flex;gap:8px;align-items:center}
+.row>*{flex:1;min-width:0}
+.hidden{display:none!important}
+.muted{color:#aaa8c5;text-align:center;font-size:14px}
+.big{font-size:24px;font-weight:900;text-align:center}
+.question{font-size:23px;font-weight:800;text-align:center;line-height:1.8;margin:20px 0}
+.judgment{background:#29203c;border-right:4px solid var(--pink);padding:13px;border-radius:12px;margin-top:15px;text-align:center;color:#ffe0f7}
+.player{padding:11px;background:#22223a;border:1px solid #ffffff17;border-radius:12px;margin:7px 0;display:flex;justify-content:space-between;align-items:center}
+.pill{font-size:12px;background:#353052;padding:4px 10px;border-radius:20px;color:#ddd}
+.center{text-align:center}
+.ball{width:175px;height:175px;border-radius:50%;margin:25px auto;background:radial-gradient(circle at 35% 30%,#fff,#24d9ff 12%,#6535d9 45%,#ed36b9 75%,#090918);box-shadow:0 0 25px #24d9ff,0 0 55px #ff36bd;display:grid;place-items:center;font-size:28px;font-weight:900;animation:float 2s ease-in-out infinite;transition:transform .12s ease}
+.ball.pulse{transform:scale(1.08)}
+@keyframes float{50%{transform:translateY(-9px) rotate(8deg)}}
+.timer{font-size:50px;font-weight:900;color:var(--green);text-align:center}
+.timer.urgent{color:#ff5277}
+hr{border:0;border-top:1px solid #ffffff19;margin:18px 0}
+footer{text-align:center;color:#77758e;font-size:12px;margin-top:35px}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+ <div class="logo">START</div>
+ <div class="subtitle">PARTY GAMES - PLAY WITH FRIENDS</div>
+</header>
+
+<section id="home">
+ <h2>اختار لعبتك</h2>
+ <div class="menu">
+  <button class="gameBtn" onclick="show('truth')">الصراحة</button>
+  <button class="gameBtn" onclick="show('spySetup')">الجاسوس</button>
+  <button class="gameBtn" onclick="show('whoSetup')">يا ترى مين</button>
+ </div>
+</section>
+
+<section id="truth" class="hidden">
+ <button class="secondary" onclick="home()">الرئيسية</button>
+ <div class="card">
+  <div class="pill">لعبة الصراحة</div>
+  <div class="big">جاهز تقول الحقيقة؟</div>
+  <div id="truthCount" class="muted">51 سؤال متنوع</div>
+  <div id="question" class="question">اضغط سؤال جديد عشان يظهرلك سؤال صراحة</div>
+  <div id="judgment" class="judgment hidden"></div>
+  <div class="center">
+   <button class="primary" onclick="nextTruth()">سؤال جديد</button>
+  </div>
+ </div>
+</section>
+
+<section id="spySetup" class="hidden">
+ <button class="secondary" onclick="home()">الرئيسية</button>
+ <div class="card">
+  <h2>لعبة الجاسوس</h2>
+  <p class="muted">ضيف أسماء اللاعبين وحدد عدد الجواسيس.</p>
+  <div class="row">
+   <input id="spyName" placeholder="اسم اللاعب" onkeydown="if(event.key==='Enter')addPlayer('spy')">
+   <button class="primary" onclick="addPlayer('spy')">إضافة</button>
+  </div>
+  <div id="spyPlayers"></div>
+  <label>عدد الجواسيس</label>
+  <input id="spyCount" type="number" min="1" value="1">
+  <label>اختار نوع الكلمة السرية</label>
+  <select id="spyCategory">
+   <option value="أكلة">أكلة</option>
+   <option value="وظيفة">وظيفة</option>
+   <option value="حيوان">حيوان</option>
+   <option value="لبس">لبس</option>
+   <option value="ميك اب">ميك أب</option>
+   <option value="دولة">دولة</option>
+  </select>
+  <div class="center">
+   <button class="primary" onclick="startSpy()">ابدأ اللعبة</button>
+  </div>
+ </div>
+</section>
+
+<section id="spyReveal" class="hidden">
+ <button class="secondary" onclick="home()">إنهاء اللعبة</button>
+ <div class="card center">
+  <h2>اعرف دورك بسرية</h2>
+  <div class="big" id="revealName"></div>
+  <p class="muted">سلّم الموبايل للاعب واضغط إظهار دوره فقط لما يكون لوحده.</p>
+  <div id="secretBox" class="hidden">
+   <div class="question" id="secretText"></div>
+   <p class="judgment" id="secretExtra"></p>
+  </div>
+  <button class="primary" id="revealBtn" onclick="revealRole()">إظهار دوري</button>
+  <button class="secondary hidden" id="hideNextBtn" onclick="nextSpyReveal()">إخفاء وتسليم الموبايل</button>
+  <div class="muted" id="revealProgress"></div>
+ </div>
+</section>
+
+<section id="spyDiscuss" class="hidden">
+ <button class="secondary" onclick="home()">إنهاء اللعبة</button>
+ <div class="card center">
+  <h2>وقت الأسئلة والنقاش</h2>
+  <p class="muted">كل لاعب يسأل لاعب تاني ويحاول يكتشف الجاسوس.</p>
+  <div class="big" id="askTurn"></div>
+  <p class="muted" id="askProgress"></p>
+  <button class="primary" onclick="nextAsk()">التالي</button>
+ </div>
+</section>
+
+<section id="spyVote" class="hidden">
+ <button class="secondary" onclick="home()">إنهاء اللعبة</button>
+ <div class="card">
+  <h2>التصويت</h2>
+  <p class="muted">كل لاعب يصوّت سرًا لشخص يعتقد إنه الجاسوس.</p>
+  <div class="big" id="voterName"></div>
+  <select id="voteChoice"></select>
+  <div class="center">
+   <button class="primary" onclick="submitVote()">تأكيد التصويت</button>
+  </div>
+  <p class="muted" id="voteProgress"></p>
+ </div>
+</section>
+
+<section id="spyResults" class="hidden">
+ <button class="secondary" onclick="home()">إنهاء اللعبة</button>
+ <div class="card center">
+  <h2>كشف الحقيقة</h2>
+  <p class="muted">استعدوا... الحقيقة هتظهر بعد</p>
+  <div class="timer" id="spyTimer">10</div>
+  <div id="spyResultText" class="hidden"></div>
+ </div>
+</section>
+
+<section id="whoSetup" class="hidden">
+ <button class="secondary" onclick="home()">الرئيسية</button>
+ <div class="card">
+  <h2>يا ترى مين</h2>
+  <p class="muted">ضيف أسماء كل اللي بيلعبوا.</p>
+  <div class="row">
+   <input id="whoName" placeholder="اسم اللاعب" onkeydown="if(event.key==='Enter')addPlayer('who')">
+   <button class="primary" onclick="addPlayer('who')">إضافة</button>
+  </div>
+  <div id="whoPlayers"></div>
+  <div class="center">
+   <button class="primary" onclick="startWho()">ابدأ اللعب</button>
+  </div>
+ </div>
+</section>
+
+<section id="whoPlay" class="hidden">
+ <button class="secondary" onclick="home()">إنهاء اللعبة</button>
+ <div class="card center">
+  <h2>مرروا الكورة!</h2>
+  <p class="muted">اضغطوا على الكورة ومرروها بين بعض لحد ما الوقت يخلص.</p>
+  <div class="timer" id="whoTimer">10</div>
+  <button class="ball" id="ball" onclick="tapBall()">START</button>
+  <div id="ballStatus" class="muted">أول ضغطة تبدأ العد التنازلي!</div>
+ </div>
+</section>
+
+<section id="whoResult" class="hidden">
+ <div class="card center">
+  <h2>يا ترى مين</h2>
+  <div class="big" id="selectedPlayer"></div>
+  <div class="judgment" id="selectedJudgment"></div>
+  <button class="primary" onclick="home()">العودة للرئيسية</button>
+  <button class="secondary" onclick="startWho()">العبوا تاني</button>
+ </div>
+</section>
+
+<footer>START - خليكوا جاهزين للحقيقة</footer>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+
+function show(id){
+ document.querySelectorAll('section').forEach(s=>s.classList.add('hidden'));
+ $(id).classList.remove('hidden');
+ window.scrollTo(0,0);
+}
+
+function home(){
+ clearInterval(spyInterval);
+ clearInterval(whoInterval);
+ show('home');
+}
+
+function shuffle(a){
+ const arr=[...a];
+ for(let i=arr.length-1;i>0;i--){
+  const j=Math.floor(Math.random()*(i+1));
+  [arr[i],arr[j]]=[arr[j],arr[i]];
+ }
+ return arr;
+}
+
+function pick(a){return a[Math.floor(Math.random()*a.length)]}
+
+function escapeHTML(s){
+ return String(s).replace(/[&<>"']/g,c=>({
+  '&':'&amp;',
+  '<':'&lt;',
+  '>':'&gt;',
+  '"':'&quot;',
+  "'":'&#39;'
+ }[c]));
+}
+
+// ================= لعبة الصراحة =================
+const truthBases=[
+"إيه أكتر سر مخبيه عن أصحابك؟",
+"مين أكتر شخص بتثق فيه؟",
+"إيه أكتر موقف ندمت عليه؟",
+"هل حكمت على حد من شكله وطلعت غلطان؟",
+"إيه أكتر صفة نفسك تغيرها في نفسك؟",
+"مين آخر شخص زعلته ومعتذرتلوش؟",
+"هل بتسامح بسهولة؟",
+"إيه أكتر حاجة بتخاف الناس تعرفها عنك؟",
+"مين شخص نفسك ترجع علاقتك بيه زي الأول؟",
+"هل غيرت الحقيقة عشان تحمي نفسك؟",
+"إيه أكتر موقف محرج حصلك؟",
+"مين صاحبك اللي ممكن تحكيله أي حاجة؟",
+"هل بتغير من نجاح حد قريب منك؟",
+"إيه أكتر وعد مقدرتش تنفذه؟",
+"هل اتكلمت عن صاحبك من وراه؟",
+"مين أكتر واحد فاهمك؟",
+"إيه حاجة بتعمل نفسك مش مهتم بيها؟",
+"هل بتفضل الصراحة حتى لو هتزعل حد؟",
+"إيه أكتر قرار غير حياتك؟",
+"مين شخص نفسك تواجهه بكلام جواك؟",
+"هل خبيت إعجابك بحد قبل كده؟",
+"إيه أكتر حاجة بتخليك تفقد ثقتك في حد؟",
+"هل حسيت إن وجودك مش مرغوب فيه؟",
+"مين صاحبك اللي نفسك تقضي معاه وقت أكتر؟",
+"إيه أكتر حاجة ندمت عليها في علاقاتك؟",
+"هل بتعرف تقول لا؟",
+"إيه موقف كشفلك معدن شخص؟",
+"مين شخص وجوده بيحسن يومك؟",
+"هل اعتذرت وأنت مش شايف نفسك غلطان؟",
+"إيه حاجة نفسك تحققها ومش بتقولها لحد؟",
+"هل بتخاف من الوحدة؟",
+"مين أكتر واحد تعتمد عليه وقت الشدة؟",
+"إيه تصرف صغير ممكن يكسرك من جواك؟",
+"هل ضيعت فرصة بسبب الخوف؟",
+"مين شخص نفسك تشكره؟",
+"إيه حاجة بتخبيها ورا الضحك والهزار؟",
+"هل بتدي فرص تانية بسهولة؟",
+"إيه موقف حسيت فيه إنك اتظلمت؟",
+"مين شخص رأيه بيفرق معاك؟",
+"هل بتحس إنك بتدي أكتر ما بتاخد؟",
+"إيه أكتر حاجة بتلفت نظرك في شخصية أي حد؟",
+"هل خذلت حد كان معتمد عليك؟",
+"مين صاحبك اللي بيكتشف إنك متضايق؟",
+"إيه عادة نفسك تبطلها؟",
+"هل بتفضل المواجهة ولا الانسحاب وقت الخلاف؟",
+"إيه درس اتعلمته بالطريقة الصعبة؟",
+"مين شخص تتمنى يفهم وجهة نظرك؟",
+"هل ندمت إنك وثقت في حد؟",
+"إيه أكتر حاجة بتخليك تحس بالأمان؟",
+"هل في شخص بتعامله عادي رغم إنك زعلان منه؟",
+"إيه حقيقة عن نفسك بدأت تتقبلها؟"
+];
+
+const judgments=[
+"حكم خفيف: قول مجاملة صادقة للي على يمينك.",
+"حكم خفيف: احكي موقف مضحك حصل لك.",
+"حكم خفيف: اختار حد وقوله صفة حلوة فيه.",
+"حكم خفيف: اعمل وش مضحك لمدة 5 ثواني.",
+"حكم خفيف: قول جملة تحفيزية للمجموعة.",
+"حكم خفيف: احكي عن أكتر أكلة بتحبها.",
+"حكم خفيف: قلد طريقة سلام صاحبك لمدة 5 ثواني.",
+"حكم خفيف: اختار حد يحكيلك ذكرى حلوة.",
+"حكم خفيف: قول حاجة بتقدّرها في نفسك.",
+"حكم خفيف: غني سطر من أغنية بتحبها."
+];
+
+let truthDeck=[],truthIndex=0,lastTruthQuestion='';
+
+function prepareTruthDeck(){
+ truthDeck=shuffle(truthBases);
+ truthIndex=0;
+ if(lastTruthQuestion&&truthDeck.length>1&&truthDeck[0]===lastTruthQuestion){
+  [truthDeck[0],truthDeck[1]]=[truthDeck[1],truthDeck[0]];
+ }
+}
+
+function nextTruth(){
+ if(truthIndex>=truthDeck.length)prepareTruthDeck();
+ const q=truthDeck[truthIndex];
+ truthIndex++;
+ lastTruthQuestion=q;
+ $('question').textContent=q;
+ $('judgment').textContent=pick(judgments);
+ $('judgment').classList.remove('hidden');
+ $('truthCount').textContent=`السؤال ${truthIndex} من ${truthBases.length}`;
+}
+
+prepareTruthDeck();
+
+// ================= كلمات لعبة الجاسوس =================
+const words={
+"أكلة":["كشري","بيتزا","ملوخية","محشي","برجر","شاورما","مكرونة","كريب","طعمية","سوشي","بطاطس","فتة","فراخ مشوية","ورق عنب","كفتة","كباب","سمك"],
+"وظيفة":["طبيب","مهندس","مدرس","طيار","محامي","طباخ","مصور","ممرض","شرطي","ممثل","مذيع","نجار","رسام","لاعب كرة","صيدلي","محاسب","مترجم"],
+"حيوان":["أسد","فيل","قطة","كلب","زرافة","حصان","دولفين","نمر","أرنب","تمساح","قرد","بطريق","دب","ثعلب","سلحفاة","كنغر","ذئب","غزال"],
+"لبس":["تيشيرت","بنطلون","جاكيت","فستان","بدلة","بيجامة","شورت","بلوفر","عباية","قميص","جيبة","كاب","شراب","حذاء","سويت شيرت","بالطو","إيشارب","نظارة شمس"],
+"ميك اب":["روج","ماسكارا","فاونديشن","كونسيلر","بلاشر","آيلاينر","بودرة","هايلايتر","ليب جلوس","برايمر","آيشادو","ليب لاينر","سبراي تثبيت","كونتور","فرش مكياج","مزيل مكياج"],
+"دولة":["مصر","السعودية","الإمارات","فرنسا","إيطاليا","ألمانيا","اليابان","الصين","البرازيل","أمريكا","تركيا","المغرب","تونس","إسبانيا","كندا","اليونان","إنجلترا","الأرجنتين","الهند","قطر"]
+};
+
+// ================= إدارة اللاعبين =================
+let spyPlayers=[];
+let whoPlayers=[];
+
+function addPlayer(type){
+ const input=$(type==='spy'?'spyName':'whoName');
+ const name=input.value.trim();
+ if(!name)return alert('اكتب اسم اللاعب الأول');
+ const list=type==='spy'?spyPlayers:whoPlayers;
+ if(list.includes(name))return alert('الاسم موجود بالفعل');
+ list.push(name);
+ input.value='';
+ renderPlayers(type);
+}
+
+function removePlayer(type,index){
+ const list=type==='spy'?spyPlayers:whoPlayers;
+ list.splice(index,1);
+ renderPlayers(type);
+}
+
+function renderPlayers(type){
+ const list=type==='spy'?spyPlayers:whoPlayers;
+ const box=$(type==='spy'?'spyPlayers':'whoPlayers');
+ box.innerHTML=list.map((n,i)=>`
+  <div class="player">
+   <span>${escapeHTML(n)}</span>
+   <button class="danger" onclick="removePlayer('${type}',${i})">حذف</button>
+  </div>
+ `).join('');
+}
+
+// ================= لعبة الجاسوس =================
+let spyRoles=[];
+let spyIndex=0;
+let spyInterval=null;
+let spyVotes={};
+let voteIndex=0;
+let askIndex=0;
+let spyWord='';
+let spyActual=[];
+
+function startSpy(){
+ const count=Number($('spyCount').value);
+ const category=$('spyCategory').value;
+ if(spyPlayers.length<3)return alert('لازم 3 لاعبين على الأقل');
+ if(!Number.isInteger(count)||count<1||count>=spyPlayers.length)return alert('عدد الجواسيس لازم يكون أقل من عدد اللاعبين');
+ spyActual=shuffle(spyPlayers).slice(0,count);
+ spyWord=pick(words[category]);
+ spyRoles=spyPlayers.map(name=>({name,spy:spyActual.includes(name)}));
+ spyIndex=0;
+ spyVotes={};
+ voteIndex=0;
+ askIndex=0;
+ show('spyReveal');
+ prepareReveal();
+}
+
+function prepareReveal(){
+ $('revealName').textContent=spyRoles[spyIndex].name;
+ $('secretBox').classList.add('hidden');
+ $('revealBtn').classList.remove('hidden');
+ $('hideNextBtn').classList.add('hidden');
+ $('revealProgress').textContent=`اللاعب ${spyIndex+1} من ${spyPlayers.length}`;
+}
+
+function revealRole(){
+ const role=spyRoles[spyIndex];
+ let text,extra;
+ if(role.spy){
+  text='أنت الجاسوس!';
+  extra=spyActual.length>1?'زميلك في فريق الجواسيس: '+spyActual.filter(n=>n!==role.name).join(' و '):'حاول تكتشف الكلمة السرية من كلام الآخرين!';
+ }else{
+  text='الكلمة السرية: '+spyWord;
+  extra='نوع الكلمة: '+$('spyCategory').value+' - حاول تكتشف مين الجاسوس!';
+ }
+ $('secretText').textContent=text;
+ $('secretExtra').textContent=extra;
+ $('secretBox').classList.remove('hidden');
+ $('revealBtn').classList.add('hidden');
+ $('hideNextBtn').classList.remove('hidden');
+}
+
+function nextSpyReveal(){
+ spyIndex++;
+ if(spyIndex>=spyRoles.length){
+  askIndex=0;
+  show('spyDiscuss');
+  updateAsk();
+ }else{
+  prepareReveal();
+ }
+}
+
+function updateAsk(){
+ const name=spyPlayers[askIndex];
+ $('askTurn').textContent=`دور ${name} يسأل لاعبًا آخر`;
+ $('askProgress').textContent=`الدور ${askIndex+1} من ${spyPlayers.length}`;
+}
+
+function nextAsk(){
+ askIndex++;
+ if(askIndex>=spyPlayers.length){
+  voteIndex=0;
+  spyVotes={};
+  show('spyVote');
+  prepareVote();
+ }else{
+  updateAsk();
+ }
+}
+
+function prepareVote(){
+ $('voterName').textContent=`تصويت اللاعب: ${spyPlayers[voteIndex]}`;
+ $('voteChoice').innerHTML='<option value="">اختار الشخص اللي بتشك فيه</option>'+
+ spyPlayers.filter(n=>n!==spyPlayers[voteIndex]).map(n=>`<option value="${escapeHTML(n)}">${escapeHTML(n)}</option>`).join('');
+ $('voteProgress').textContent=`التصويت ${voteIndex+1} من ${spyPlayers.length}`;
+}
+
+function submitVote(){
+ const choice=$('voteChoice').value;
+ if(!choice)return alert('اختار لاعب قبل التأكيد');
+ spyVotes[choice]=(spyVotes[choice]||0)+1;
+ voteIndex++;
+ if(voteIndex<spyPlayers.length){
+  prepareVote();
+  return;
+ }
+ startSpyCountdown();
+}
+
+function startSpyCountdown(){
+ show('spyResults');
+ let t=10;
+ $('spyTimer').textContent=t;
+ $('spyTimer').classList.remove('urgent');
+ $('spyResultText').classList.add('hidden');
+ clearInterval(spyInterval);
+ spyInterval=setInterval(()=>{
+  t--;
+  $('spyTimer').textContent=t;
+  if(t<=3)$('spyTimer').classList.add('urgent');
+  beep(t<=3?900:700);
+  if(t<=0){
+   clearInterval(spyInterval);
+   showSpyResults();
+  }
+ },1000);
+}
+
+function showSpyResults(){
+ $('spyTimer').textContent='انتهى!';
+ $('spyTimer').classList.remove('urgent');
+ const max=Math.max(0,...Object.values(spyVotes));
+ const mostVoted=Object.keys(spyVotes).filter(n=>spyVotes[n]===max);
+ const innocent=mostVoted.filter(n=>!spyActual.includes(n));
+ const wrong=innocent.length?innocent.join('، '):'مفيش لاعب بريء حصل على أعلى تصويت';
+ $('spyResultText').innerHTML=`
+  <h2>الجواسيس الحقيقيين</h2>
+  <div class="question">${spyActual.map(escapeHTML).join('، ')}</div>
+  <hr>
+  <h3>أكثر لاعب بريء حصل على تصويتات</h3>
+  <div class="question">${escapeHTML(wrong)}</div>
+  <p class="muted">الكلمة السرية كانت: ${escapeHTML(spyWord)}</p>
+  <button class="primary" onclick="home()">لعبة جديدة</button>
+ `;
+ $('spyResultText').classList.remove('hidden');
+}
+
+function beep(freq=700){
+ try{
+  const ctx=new(window.AudioContext||window.webkitAudioContext)();
+  const osc=ctx.createOscillator();
+  const gain=ctx.createGain();
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  osc.frequency.value=freq;
+  gain.gain.value=.08;
+  osc.start();
+  osc.stop(ctx.currentTime+.12);
+  osc.onended=()=>ctx.close();
+ }catch(e){}
+}
+
+// ================= يا ترى مين =================
+const verdicts=[
+"احكيلنا موقف مضحك حصلك.",
+"قول أكتر أكلة بتحبها.",
+"اختار لاعب وقوله صفة حلوة فيه.",
+"اعمل إعلان عن أي حاجة موجودة قدامك لمدة 10 ثواني.",
+"قلد صوت حيوان لمدة 5 ثواني.",
+"احكي عن موقف اتكسفت فيه.",
+"قول اسم فيلم أو مسلسل بتحبه.",
+"اعمل وش مضحك لمدة 5 ثواني.",
+"قول نكتة خفيفة.",
+"اختار حد يعمل معاك حركة سلام مضحكة.",
+"احكي عن أحلى يوم في حياتك.",
+"قول 3 حاجات بتحبها في القعدة دي.",
+"اتكلم بصوت مذيع لمدة 10 ثواني.",
+"اعمل تمثيلية صامتة والكل يخمن.",
+"قول كلمة حلوة لكل الموجودين.",
+"اختار أغنية وغني منها سطر.",
+"احكي عن أغرب أكلة جربتها.",
+"قلد شخصية كرتونية.",
+"قول أمنية نفسك تحققها.",
+"اعمل حركة رياضية بسيطة في مكانك."
+];
+
+let whoInterval=null;
+let whoStarted=false;
+let whoTaps=0;
+
+function startWho(){
+ if(whoPlayers.length<2)return alert('ضيف لاعبين على الأقل');
+ clearInterval(whoInterval);
+ whoStarted=false;
+ whoTaps=0;
+ show('whoPlay');
+ $('whoTimer').textContent='10';
+ $('whoTimer').classList.remove('urgent');
+ $('ballStatus').textContent='أول ضغطة تبدأ العد التنازلي!';
+ $('ball').textContent='START';
+}
+
+function tapBall(){
+ whoTaps++;
+ $('ball').classList.add('pulse');
+ setTimeout(()=>$('ball').classList.remove('pulse'),120);
+
+ if(!whoStarted){
+  whoStarted=true;
+  let t=10;
+  $('whoTimer').textContent=t;
+  $('ball').textContent='PASS!';
+  $('ballStatus').textContent='مرروا الكورة بسرعة! (تمريرات: 1)';
+  whoInterval=setInterval(()=>{
+   t--;
+   $('whoTimer').textContent=t;
+   if(t<=3)$('whoTimer').classList.add('urgent');
+   if(t>0)beep(650);
+   if(t<=0){
+    clearInterval(whoInterval);
+    beep(950);
+    const candidateIndex=(whoTaps-1+Math.floor(Math.random()*whoPlayers.length))%whoPlayers.length;
+    const winner=whoPlayers[candidateIndex];
+    $('selectedPlayer').textContent=winner;
+    $('selectedJudgment').textContent=pick(verdicts);
+    show('whoResult');
+   }
+  },1000);
+ }else{
+  $('ballStatus').textContent=`مرروا الكورة بسرعة! (تمريرات: ${whoTaps})`;
+ }
+}
+</script>
+</body>
+</html>
